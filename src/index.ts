@@ -80,7 +80,6 @@ class FaceIT {
 
   async getPlayerDetailsByUsername(playerUsername: string) {
     const { data, error } = await this.getRequest(`players`, `nickname=${playerUsername}`);
-
     const _data = data as IPlayer;
     return { data: _data, error };
   }
