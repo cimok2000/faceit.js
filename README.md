@@ -1,4 +1,4 @@
-# FaceIT.js - FaceIT.com API Wrapper
+# FaceIT.js - [FaceIT.com](https://www.faceit.com/) API Wrapper
 
 _This is not an Official FaceIT Package!_
 
