@@ -4,7 +4,7 @@ _This is not an Official FaceIT Package!_
 
 ## TODO:
 
-- [ ] Create a error parser.
+- [x] Create a error parser.
 - [ ] Create a custom logger.
 
 ## Install

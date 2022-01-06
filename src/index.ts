@@ -1,21 +1,41 @@
+import Axios from "axios";
 import chalk from "chalk";
-import Axios, { AxiosResponse } from "axios";
 import { IGames, IGame, IMatch, IMatchStats } from "./types/matchTypes";
 import { IPlayer, IPlayerMatches } from "./types/playerTypes";
+
+class Logger {
+  constructor() {}
+
+  request(method: string, url: string) {
+    console.log(`${chalk.red("[REQUEST]")} ${chalk.blue(`${method}`)} ${chalk.green(url)}`);
+  }
+}
 
 class FaceIT {
   version: string;
   url: string;
   authorizationToken: string;
+  useLogger: boolean;
+  logger: Logger;
 
-  constructor(token: string) {
+  constructor(token: string, logger = false) {
     this.version = "v4";
     this.url = `https://open.faceit.com/data/${this.version}`;
     this.authorizationToken = `Bearer ${token}`;
+    this.useLogger = logger;
+    this.logger = new Logger();
+  }
+
+  parseError(error: any) {
+    return {
+      code: error.response.status,
+      text: error.response.statusText,
+    };
   }
 
   async getRequest(endpoint: string, params?: string) {
     const requestUrl = params ? `${this.url}/${endpoint}?${params}` : `${this.url}/${endpoint}`;
+    if (this.useLogger) this.logger.request("GET", requestUrl);
     try {
       const req = await Axios.get(requestUrl, {
         headers: {
@@ -24,14 +44,14 @@ class FaceIT {
       });
       return { data: req.data, error: null };
     } catch (error) {
-      return { data: null, error: error };
+      return { data: null, error: this.parseError(error) };
     }
   }
 
   async testKey() {
     const { data, error } = await this.getRequest("games", "limit=1");
-    if (data) return true;
-    else if (error) return false;
+    if (data) return { data: true, error };
+    else return { data: false, error };
   }
 
   async getGames() {
@@ -52,45 +72,6 @@ class FaceIT {
     return { data: _data, error };
   }
 
-  // async getMatchPlayers(matchId: string) {
-  //   const match = await this.getMatch(matchId);
-  //   return match;
-  //   // for (const [key, faction] of Object.entries(match.teams)) {
-  //   //   console.log(chalk.magenta(`${faction.name}`));
-  //   //   faction.roster.map((player) => {
-  //   //     console.log("-------------------------------------------------------------");
-  //   //     console.log(`${chalk.red("[NAME]")}: ${player.nickname}`);
-  //   //     console.log(`${chalk.blue("[MEMBERSHIP]")}: ${player.membership}`);
-  //   //     console.log(`${chalk.green("[ANTICHEAT]")}: ${player.anticheat_required}`);
-  //   //     console.log(`${chalk.cyan("[LEVEL]")}: ${player.game_skill_level}`);
-  //   //   });
-  //   //   console.log("-------------------------------------------------------------");
-  //   // }
-  // }
-
-  // async getMatchMapPick(matchId: string) {
-  //   const match = await this.getMatch(matchId);
-  //   return match;
-  //   // match.voting.map.entities.map((map) => {
-  //   //   console.log(`${chalk.red("[NAME]")}: ${map.name}`);
-  //   //   console.log(`${chalk.green("[IMAGE]")}: ${map.image_lg}`);
-  //   //   console.log("------------------------------------------------------------------------------------------");
-  //   // });
-  //   // console.log(`${chalk.blue("[MAP CHOSEN]")}: ${match.voting.map.pick}`);
-  // }
-
-  // async getMatchLocationPick(matchId: string) {
-  //   const match = await this.getMatch(matchId);
-  //   return match;
-  //   // match.voting.location.entities.map((location) => {
-  //   //   console.log(`${chalk.red("[COUNTRY]")}: ${location.name}`);
-  //   //   console.log(`${chalk.red("[GUID]")}: ${location.guid}`);
-  //   //   console.log(`${chalk.red("[IMAGE]")}: ${location.image_lg}`);
-  //   //   console.log("------------------------------------------------------------------------------------------");
-  //   // });
-  //   // console.log(`${chalk.blue("[LOCATION CHOSEN]")}: ${match.voting.location.pick}`);
-  // }
-
   async getMatchStats(matchId: string) {
     const { data, error } = await this.getRequest(`matches/${matchId}/stats`);
     const _data = data as IMatchStats;
@@ -99,6 +80,7 @@ class FaceIT {
 
   async getPlayerDetailsByUsername(playerUsername: string) {
     const { data, error } = await this.getRequest(`players`, `nickname=${playerUsername}`);
+
     const _data = data as IPlayer;
     return { data: _data, error };
   }
