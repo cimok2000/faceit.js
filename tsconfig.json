@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es5",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
+    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2017", "es7", "es6", "dom"]
+  },
+  "exclude": ["node_modules", "dist"]
+}
