@@ -12,7 +12,7 @@ _This is not an Official FaceIT Package!_
 Coming Soon..
 
 ```
-npm install faceit.js
+npm install @cimok/faceit.js
 ```
 
 ## Usage
