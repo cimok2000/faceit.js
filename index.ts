@@ -1,5 +1,6 @@
 import Axios from "axios";
 import chalk from "chalk";
+import { IHub, IMatches, IMembers, IRoles, IRules, IStats } from "./types/hubTypes";
 import { IGames, IGame, IMatch, IMatchStats } from "./types/matchTypes";
 import { IPlayer, IPlayerMatches } from "./types/playerTypes";
 
@@ -48,52 +49,58 @@ class FaceIT {
     }
   }
 
-  async testKey() {
+  async validate() {
     const { data, error } = await this.getRequest("games", "limit=1");
     if (data) return { data: true, error };
     else return { data: false, error };
   }
 
-  async getGames() {
+  async games() {
     const { data, error } = await this.getRequest("games", "offset=0&limit=20");
     const _data = data as IGames;
     return { data: _data, error };
   }
 
-  async getGame(gameId: string) {
-    const { data, error } = await this.getRequest(`games/${gameId}`);
+  async game(gameID: string) {
+    const { data, error } = await this.getRequest(`games/${gameID}`);
     const _data = data as IGame;
     return { data: _data, error };
   }
 
-  async getMatch(matchId: string) {
-    const { data, error } = await this.getRequest(`matches/${matchId}`);
+  async match(matchID: string) {
+    const { data, error } = await this.getRequest(`matches/${matchID}`);
     const _data = data as IMatch;
     return { data: _data, error };
   }
 
-  async getMatchStats(matchId: string) {
-    const { data, error } = await this.getRequest(`matches/${matchId}/stats`);
+  async matchStats(matchID: string) {
+    const { data, error } = await this.getRequest(`matches/${matchID}/stats`);
     const _data = data as IMatchStats;
     return { data: _data, error };
   }
 
-  async getPlayerDetailsByUsername(playerUsername: string) {
+  async playerByUsername(playerUsername: string) {
     const { data, error } = await this.getRequest(`players`, `nickname=${playerUsername}`);
     const _data = data as IPlayer;
     return { data: _data, error };
   }
 
-  async getPlayerDetailsByID(playerID: string) {
+  async playerByID(playerID: string) {
     const { data, error } = await this.getRequest(`players/${playerID}`);
     const _data = data as IPlayer;
     return { data: _data, error };
   }
 
-  async getPlayerMatchHistory(playerID: string, gameID: string, offset: number = 0, limit: number = 20) {
+  async playerHistory(playerID: string, gameID: string, offset: number = 0, limit: number = 20) {
     const { data, error } = await this.getRequest(`players/${playerID}/history`, `game=${gameID}&offset=${offset}&limit=${limit}`);
     const _data = data as IPlayerMatches;
     return { data: _data, error };
+  }
+
+  async hub(hubID: string, option?: string) {
+    if (!hubID) return;
+    const { data, error } = await this.getRequest(option ? `hubs/${hubID}/${option}` : `hubs/${hubID}`);
+    return { data: data, error: error };
   }
 }
 
